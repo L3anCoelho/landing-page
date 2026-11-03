@@ -23,7 +23,7 @@ if (menuToggle && mobileMenu) {
 // ============================================================
 // DIMINUIR VELOCIDADE DOS VÍDEOS
 // ============================================================
-document.querySelectorAll("video").forEach(video => {
+document.querySelectorAll(".service-card video").forEach(video => {
   video.playbackRate = 0.6;
 });
 
@@ -143,75 +143,6 @@ document.querySelectorAll('.carousel').forEach(carousel => {
 
 });
 
-  // ============================================================
-  // AVANÇO AUTOMÁTICO PARA IMAGENS
-  // ============================================================
-  const startAuto = () => {
-
-    stopAuto();
-
-    autoPlay = setInterval(() => {
-
-      const currentSlide = slides[index];
-
-      if (currentSlide.tagName !== "VIDEO") {
-        goTo(index + 1);
-      }
-
-    }, 6000);
-
-  };
-
-  const stopAuto = () => {
-    if (autoPlay) {
-      clearInterval(autoPlay);
-      autoPlay = null;
-    }
-  };
-
-  // ============================================================
-  // VÍDEOS PASSAM AUTOMATICAMENTE QUANDO TERMINAM
-  // ============================================================
-  slides.forEach((slide, i) => {
-
-    if (slide.tagName === "VIDEO") {
-
-      slide.addEventListener("ended", () => {
-        goTo(i + 1);
-      });
-
-    }
-
-  });
-
-  // Botões
-  nextBtn.addEventListener('click', () => goTo(index + 1));
-  prevBtn.addEventListener('click', () => goTo(index - 1));
-
-  // Pause no hover
-  carousel.addEventListener('mouseenter', stopAuto);
-  carousel.addEventListener('mouseleave', startAuto);
-
-  // Swipe mobile
-  let startX = 0;
-
-  carousel.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-  }, { passive: true });
-
-  carousel.addEventListener('touchend', e => {
-
-    const diff = startX - e.changedTouches[0].clientX;
-
-    if (diff > 50)  goTo(index + 1);
-    if (diff < -50) goTo(index - 1);
-
-  }, { passive: true });
-
-  startAuto();
-
-
-
 // ============================================================
 // CAROUSEL DE WORKS
 // ============================================================
@@ -281,5 +212,42 @@ if (worksCarousel) {
     startWorksAuto();
 
   }
+
+}
+
+// ============================================================
+// TRABALHOS — MODAL DE VÍDEO
+// ============================================================
+const videoModal = document.getElementById('videoModal');
+
+if (videoModal) {
+
+  const modalVideo = videoModal.querySelector('video');
+  const modalTitle = videoModal.querySelector('#videoModalTitle');
+  const closeBtn   = videoModal.querySelector('.video-modal-close');
+
+  const closeVideo = () => {
+    modalVideo.pause();
+    modalVideo.removeAttribute('src');
+    modalVideo.load();
+    if (videoModal.open) videoModal.close();
+  };
+
+  document.querySelectorAll('[data-video]').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      modalTitle.textContent = trigger.dataset.title || '';
+      modalVideo.src = trigger.dataset.video;
+      videoModal.showModal();
+      modalVideo.play().catch(() => {});
+    });
+  });
+
+  closeBtn.addEventListener('click', closeVideo);
+  videoModal.addEventListener('close', closeVideo);
+
+  // Fecha ao clicar fora do vídeo
+  videoModal.addEventListener('click', e => {
+    if (e.target === videoModal) closeVideo();
+  });
 
 }
